@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import com.promise.exceptions.ProjectIdException;
+import com.promise.exceptions.ProjectNotFoundException;
 import com.promise.models.Project;
 import com.promise.repositories.ProjectRepository;
 
@@ -33,7 +34,11 @@ public class ProjectService {
 	}
 	
 	public List<Project> findAllProjects() {
-		return projectRepo.findAll();
+		List<Project>projects = projectRepo.findAll();
+		if(projects.size() == 0) {
+			throw new ProjectNotFoundException("No projects found");
+		}
+		return projects;
 	}
 	
 //	public void findProject(String projectIdentifier) {
@@ -46,14 +51,28 @@ public class ProjectService {
 	public Project findProjectById(String projectIdentifier) {
 		Project project = projectRepo.findByProjectIdentifier(projectIdentifier.toLowerCase());
 		if(project == null) {
-			throw new ProjectIdException("projectIdentifier '" + projectIdentifier + "' does not exist");
+			throw new ProjectNotFoundException("projectIdentifier '" + projectIdentifier + "' cannot be found");
 		}
 		
 		return project;
 	}
 	
+	public Project updateProject(String projectIdentifier, Project project) {
+		Project project1 = projectRepo.findByProjectIdentifier(projectIdentifier.toLowerCase());
+		if(project1 == null) {
+			throw new ProjectIdException("projectIdentifier '" + projectIdentifier + "' does not exist so cannot be updated");
+		} else if(!project1.getProjectIdentifier().equalsIgnoreCase(project.getProjectIdentifier())) {
+			throw new ProjectIdException("Project Identifier cannot be changed so this project has not been updated");
+		}
+		
+		return projectRepo.save(project);
+	}
+	
 	public void deleteById(String projectIdentifier) {
 		Project project = projectRepo.findByProjectIdentifier(projectIdentifier.toLowerCase());
+		if(project == null) {
+			throw new ProjectIdException("projectIdentifier '" + projectIdentifier + "' does not exist so cannot be deleted");
+		}
 		projectRepo.deleteById(project.getId());
 	}
 	
