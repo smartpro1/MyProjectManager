@@ -22,13 +22,13 @@ public class Project {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotBlank(message="project name is required")
-	@Size(min=3, max = 20, message="project name must be between three to twenty characters long")
+	@Size(min=3, max = 30, message="project name must be between three to thirty characters long")
 	private String projectName;
 	@NotBlank(message="project identifier is required")
-	@Size(min=3,max=10, message="project identifier must be between three to ten characters long")
-	@Column(updatable=false)
+	@Size(min=3,max=20, message="project identifier must be between three to twenty characters long")
+	@Column(updatable=false, unique = true)
 	private String projectIdentifier;
-	@Size(min=3,max=50, message="project identifier must be between three to fifty characters long")
+	@Size(min=3,max=50, message="project description must be between three to fifty characters long")
 	@NotBlank(message="project description is required")
 	private String description;
 	@JsonFormat(pattern = "yyyy-MM-dd")
@@ -36,6 +36,7 @@ public class Project {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private String end_date;
 	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Column(updatable=false)
 	private Date created_at;
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date updated_at;
