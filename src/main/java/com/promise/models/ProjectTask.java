@@ -120,6 +120,8 @@ public class ProjectTask {
 	public void setUpdated_At(Date updated_At) {
 		this.updated_At = updated_At;
 	}
+	
+	
 
 	@Override
 	public String toString() {
