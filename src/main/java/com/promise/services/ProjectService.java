@@ -72,6 +72,8 @@ public class ProjectService {
 			throw new ProjectIdException("Project Identifier cannot be changed so this project has not been updated");
 		}
 		
+		project.setBacklog(project1.getBacklog());
+		
 		return projectRepo.save(project);
 	}
 	

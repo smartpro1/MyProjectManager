@@ -51,7 +51,9 @@ public class ProjectController {
 	}
 	
 	@PutMapping(value="/{projectIdentifier}", consumes="application/json")
-	public ResponseEntity<?> updateProject(@PathVariable() String projectIdentifier, @RequestBody Project project) {
+	public ResponseEntity<?> updateProject(@PathVariable() String projectIdentifier,@Valid @RequestBody Project project, BindingResult result) {
+		if(result.hasErrors()) return projectService.validateError(result);
+		
 		Project updateProject = projectService.updateProject(projectIdentifier, project);
 		return new ResponseEntity<Project>(updateProject, HttpStatus.OK);
 	}
