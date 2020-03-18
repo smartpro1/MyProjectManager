@@ -37,7 +37,7 @@ public class ProjectTask {
 	
 	// ManyToOne with Backlog
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
-	@JoinColumn(name="backlog_id")
+	@JoinColumn(name="backlog_id", updatable = false, nullable = false)
 	@JsonIgnore
 	private Backlog backlog;
 	
@@ -134,6 +134,15 @@ public class ProjectTask {
 	}
 	
 	
+	
+
+	public Backlog getBacklog() {
+		return backlog;
+	}
+
+	public void setBacklog(Backlog backlog) {
+		this.backlog = backlog;
+	}
 
 	@Override
 	public String toString() {

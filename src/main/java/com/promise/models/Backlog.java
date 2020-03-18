@@ -32,7 +32,7 @@ public class Backlog {
 	
 	// OneToMany with ProjectTask
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="backlog")
-	List<ProjectTask> projectTask = new ArrayList<>();
+	List<ProjectTask> projectTasks = new ArrayList<>();
 	
 	public Backlog() {
 		
@@ -70,13 +70,15 @@ public class Backlog {
 		this.project = project;
 	}
 
-	public List<ProjectTask> getProjectTask() {
-		return projectTask;
+	public List<ProjectTask> getProjectTasks() {
+		return projectTasks;
 	}
 
-	public void setProjectTask(List<ProjectTask> projectTask) {
-		this.projectTask = projectTask;
+	public void setProjectTasks(List<ProjectTask> projectTasks) {
+		this.projectTasks = projectTasks;
 	}
+
+	
 	
 	
 	

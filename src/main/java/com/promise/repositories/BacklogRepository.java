@@ -8,4 +8,6 @@ import com.promise.models.Backlog;
 @Repository
 public interface BacklogRepository extends JpaRepository<Backlog, Long> {
 
+	Backlog findByProjectIdentifier(String projectidentifier);
+
 }
