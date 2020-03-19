@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 
 import com.promise.exceptions.ProjectIdException;
 import com.promise.exceptions.ProjectNotFoundException;
+import com.promise.models.Backlog;
 import com.promise.models.Project;
 import com.promise.repositories.ProjectRepository;
 
@@ -29,7 +30,13 @@ public class ProjectService {
 		if(newProject != null) {
 			throw new ProjectIdException("projectIdentifier '" + projIdentifier + "' already exists choose another name for it");
 		}
-		project.setProjectIdentifier(projIdentifier);
+		
+		Backlog backlog = new Backlog();
+		project.setBacklog(backlog);
+	    backlog.setProject(project);
+		backlog.setProjectIdentifier(projIdentifier);
+	project.setProjectIdentifier(projIdentifier);
+		
 		return projectRepo.save(project);
 	}
 	
@@ -64,6 +71,8 @@ public class ProjectService {
 		} else if(!project1.getProjectIdentifier().equalsIgnoreCase(project.getProjectIdentifier())) {
 			throw new ProjectIdException("Project Identifier cannot be changed so this project has not been updated");
 		}
+		
+		project.setBacklog(project1.getBacklog());
 		
 		return projectRepo.save(project);
 	}
