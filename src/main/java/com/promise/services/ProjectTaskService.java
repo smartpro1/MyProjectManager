@@ -57,6 +57,10 @@ public class ProjectTaskService {
 		if(!isBacklog(projectIdentifier) || projectTask == null) {
 			throw new ProjectNotFoundException("Invalid project Identifier or projectSequence");
 		}
+		
+		if(!projectTask.getProjectIdentifier().equals(projectIdentifier)) {
+			throw new ProjectNotFoundException("The projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
+		}
 		return projectTask;
 	}
 	
