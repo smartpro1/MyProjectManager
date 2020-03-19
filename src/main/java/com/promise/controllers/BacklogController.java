@@ -32,7 +32,7 @@ public class BacklogController {
 	private ProjectService projectService;
 	
 	@PostMapping("/{projectIdentifier}")
-	public ResponseEntity<?> createProjectTask(@Valid @RequestBody ProjectTask projectTask, @PathVariable String projectIdentifier, BindingResult result){
+	public ResponseEntity<?> createProjectTask(@PathVariable String projectIdentifier, @Valid @RequestBody ProjectTask projectTask, BindingResult result){
 		if(result.hasErrors()) return projectService.validateError(result);
 		ProjectTask newProjectTask = projectTaskService.createProjectTask(projectIdentifier, projectTask);
 		return new ResponseEntity<ProjectTask>(newProjectTask, HttpStatus.CREATED);

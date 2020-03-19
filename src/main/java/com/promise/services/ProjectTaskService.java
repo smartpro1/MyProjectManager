@@ -44,6 +44,10 @@ public class ProjectTaskService {
 	}
 	
 	public List<ProjectTask> getProjectTasksByProjectIdentifier(String projectIdentifier){
+		Backlog backlog = backlogRepo.findByProjectIdentifier(projectIdentifier);
+		if(backlog == null) {
+			throw new ProjectNotFoundException("The projectIdentifier supplied '" + projectIdentifier + "' is invalid.");
+		}
 		return projectTaskRepo.findByProjectIdentifierOrderByPriority(projectIdentifier);	
 	}
 
