@@ -44,11 +44,26 @@ public class ProjectTaskService {
 	}
 	
 	public List<ProjectTask> getProjectTasksByProjectIdentifier(String projectIdentifier){
-		Backlog backlog = backlogRepo.findByProjectIdentifier(projectIdentifier);
-		if(backlog == null) {
+		
+		if(!isBacklog(projectIdentifier)) {
 			throw new ProjectNotFoundException("The projectIdentifier supplied '" + projectIdentifier + "' is invalid.");
 		}
 		return projectTaskRepo.findByProjectIdentifierOrderByPriority(projectIdentifier);	
+	}
+	
+	public ProjectTask findProjectByProjectSequence(String projectIdentifier, String projectSequence) {
+		
+		ProjectTask projectTask = projectTaskRepo.findByProjectSequence(projectSequence);
+		if(!isBacklog(projectIdentifier) || projectTask == null) {
+			throw new ProjectNotFoundException("Invalid project Identifier or projectSequence");
+		}
+		return projectTask;
+	}
+	
+	public Boolean isBacklog(String projectIdentifier) {
+		Backlog backlog = backlogRepo.findByProjectIdentifier(projectIdentifier);
+		if(backlog == null) return false;
+		return true;
 	}
 
 }
