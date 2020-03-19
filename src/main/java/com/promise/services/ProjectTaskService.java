@@ -64,10 +64,29 @@ public class ProjectTaskService {
 		return projectTask;
 	}
 	
+	public ProjectTask updateProjectTaskByProjectSequence(String projectIdentifier, String projectSequence, ProjectTask projectTask) {
+		ProjectTask projectTask1 = projectTaskRepo.findByProjectSequence(projectSequence);
+		if(!isBacklog(projectIdentifier) || projectTask1 == null) {
+			throw new ProjectNotFoundException("Invalid project Identifier or projectSequence");
+		}
+		
+		if(!projectTask.getProjectIdentifier().equals(projectIdentifier)) {
+			throw new ProjectNotFoundException("The projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
+		}
+		
+		if(!projectTask.getProjectIdentifier().equals(projectIdentifier)) {
+			throw new ProjectNotFoundException("update declined: projectIdentifier cannot be changed");
+		}
+		
+		return projectTaskRepo.save(projectTask);
+	}
+	
 	public Boolean isBacklog(String projectIdentifier) {
 		Backlog backlog = backlogRepo.findByProjectIdentifier(projectIdentifier);
 		if(backlog == null) return false;
 		return true;
 	}
+	
+	
 
 }
