@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.promise.exceptions.ProjectNotFoundException;
 import com.promise.models.Backlog;
@@ -70,7 +71,7 @@ public class ProjectTaskService {
 			throw new ProjectNotFoundException("Invalid project Identifier or projectSequence");
 		}
 		
-		if(!projectTask.getProjectIdentifier().equals(projectIdentifier)) {
+		if(!projectTask1.getProjectIdentifier().equals(projectIdentifier)) {
 			throw new ProjectNotFoundException("The projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
 		}
 		
@@ -79,6 +80,21 @@ public class ProjectTaskService {
 		}
 		
 		return projectTaskRepo.save(projectTask);
+	}
+	
+	@Transactional
+	public void deleteProjectTaskByProjectSequence(String projectIdentifier, String projectSequence) {
+		ProjectTask projectTask1 = projectTaskRepo.findByProjectSequence(projectSequence);
+		if(!isBacklog(projectIdentifier) || projectTask1 == null) {
+			throw new ProjectNotFoundException("Delete declined: invalid project Identifier or projectSequence");
+		}
+		
+		if(!projectTask1.getProjectIdentifier().equals(projectIdentifier)) {
+			throw new ProjectNotFoundException("Delete declined: the projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
+		}
+		
+		projectTaskRepo.deleteByProjectSequence(projectSequence);
+		                
 	}
 	
 	public Boolean isBacklog(String projectIdentifier) {
