@@ -1,5 +1,7 @@
 package com.promise.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,12 @@ public class ProjectTaskService {
 		if(backlog == null) {
 			throw new ProjectNotFoundException("The projectIdentifier supplied '" + projectIdentifier + "' is invalid.");
 		}
-		Integer newSequence = backlog.getProjectSequence() + 1;
+		Integer backlogSequence = backlog.getProjectSequence();
+		backlogSequence += 1;
+		backlog.setProjectSequence(backlogSequence);
+		
 		projectTask.setProjectIdentifier(projectIdentifier);
-		projectTask.setProjectSequence(projectIdentifier + "-" + newSequence);
+		projectTask.setProjectSequence(projectIdentifier + "-" + backlogSequence);
 		if(projectTask.getStatus() == null || projectTask.getStatus() == "") {
 			projectTask.setStatus("TO_DO");
 		}
@@ -36,6 +41,10 @@ public class ProjectTaskService {
 		
 		return projectTaskRepo.save(projectTask);
 			
+	}
+	
+	public List<ProjectTask> getProjectTasksByProjectIdentifier(String projectIdentifier){
+		return projectTaskRepo.findByProjectIdentifierOrderByPriority(projectIdentifier);	
 	}
 
 }

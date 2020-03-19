@@ -45,7 +45,7 @@ public class Project {
 	
 	// OneToOne with Backlog
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="project")
-	//@JsonIgnore
+	@JsonIgnore
 	private Backlog backlog;
 	
 	
