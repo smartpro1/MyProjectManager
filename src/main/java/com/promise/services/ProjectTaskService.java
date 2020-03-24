@@ -38,6 +38,10 @@ public class ProjectTaskService {
 			projectTask.setPriority(3);
 		}
 		
+		if(projectTask.getAcceptanceCriteria() == "" || projectTask.getAcceptanceCriteria() == null) {
+			projectTask.setAcceptanceCriteria("accepted");
+		}
+		
 		projectTask.setBacklog(backlog);
 		
 		return projectTaskRepo.save(projectTask);

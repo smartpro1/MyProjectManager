@@ -53,22 +53,21 @@ public class ProjectController {
 		return new ResponseEntity<Project>(project, HttpStatus.OK);
 	}
 	
-<<<<<<< HEAD
-	@PutMapping(value="/{projectIdentifier}")
-	//@RequestMapping(value = "/{projectIdentifier}", method = RequestMethod.PUT)
-	public ResponseEntity<?> updateProject(@PathVariable("projectIdentifier") String projectIdentifier, @Valid @RequestBody Project project, BindingResult result) {
-		System.out.println("got here 1");
-		if(result.hasErrors()) {
-			System.out.println("entered hasErrors");
-			System.out.println(result);
-			return projectService.validateError(result);
-		}
-		System.out.println("got here 2");
-=======
+//<<<<<<< HEAD
+//	@PutMapping(value="/{projectIdentifier}")
+//	//@RequestMapping(value = "/{projectIdentifier}", method = RequestMethod.PUT)
+//	public ResponseEntity<?> updateProject(@PathVariable("projectIdentifier") String projectIdentifier, @Valid @RequestBody Project project, BindingResult result) {
+//		System.out.println("got here 1");
+//		if(result.hasErrors()) {
+//			System.out.println("entered hasErrors");
+//			System.out.println(result);
+//			return projectService.validateError(result);
+//		}
+//		System.out.println("got here 2");
 	@PutMapping(value="/{projectIdentifier}", consumes="application/json")
 	public ResponseEntity<?> updateProject(@PathVariable() String projectIdentifier,@Valid @RequestBody Project project, BindingResult result) {
 		if(result.hasErrors()) return projectService.validateError(result);
->>>>>>> develop
+
 		
 		Project updateProject = projectService.updateProject(projectIdentifier, project);
 		System.out.println("passed updateProject");
