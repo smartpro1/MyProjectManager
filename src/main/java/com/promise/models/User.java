@@ -50,6 +50,10 @@ public class User implements UserDetails{
 //	@OneToMany(cascade = CascadeType.REFRESH, mappedBy="user", orphanRemoval=true)
 //	private Project project;
 	
+    public User() {
+		
+	}
+	
 	public Long getId() {
 		return id;
 	}

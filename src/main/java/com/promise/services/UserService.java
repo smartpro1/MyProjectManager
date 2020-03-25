@@ -25,6 +25,7 @@ public class UserService {
 		
 		 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 		 user.setConfirmPassword("");
+		 // my code
 		 return userRepo.save(user);
 		
 		 
