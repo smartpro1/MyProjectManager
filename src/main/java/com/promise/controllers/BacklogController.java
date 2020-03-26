@@ -1,5 +1,6 @@
 package com.promise.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -35,21 +36,22 @@ public class BacklogController {
 	private ProjectService projectService;
 	
 	@PostMapping("/{projectIdentifier}")
-	public ResponseEntity<?> createProjectTask(@PathVariable String projectIdentifier, @Valid @RequestBody ProjectTask projectTask, BindingResult result){
+	public ResponseEntity<?> createProjectTask(@PathVariable String projectIdentifier, @Valid @RequestBody ProjectTask projectTask,
+			BindingResult result, Principal principal){
 		if(result.hasErrors()) return projectService.validateError(result);
-		ProjectTask newProjectTask = projectTaskService.createProjectTask(projectIdentifier, projectTask);
+		ProjectTask newProjectTask = projectTaskService.createProjectTask(projectIdentifier, projectTask, principal.getName());
 		return new ResponseEntity<ProjectTask>(newProjectTask, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/{projectIdentifier}")
-	public ResponseEntity<?> getProjectTasksByProjectIdentifier(@PathVariable String projectIdentifier){
-		List<ProjectTask> projectTasks = projectTaskService.getProjectTasksByProjectIdentifier(projectIdentifier);
+	public ResponseEntity<?> getProjectTasksByProjectIdentifier(@PathVariable String projectIdentifier, Principal principal){
+		List<ProjectTask> projectTasks = projectTaskService.getProjectTasksByProjectIdentifier(projectIdentifier, principal.getName());
 		return new ResponseEntity<List<ProjectTask>>(projectTasks, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{projectIdentifier}/{projectSequence}")
-	public ResponseEntity<?> getProjectByProjectSequence(@PathVariable String projectIdentifier,  @PathVariable String projectSequence){
-		ProjectTask projectTask = projectTaskService.findProjectByProjectSequence(projectIdentifier, projectSequence);
+	public ResponseEntity<?> getProjectByProjectSequence(@PathVariable String projectIdentifier,  @PathVariable String projectSequence, Principal principal){
+		ProjectTask projectTask = projectTaskService.findProjectByProjectSequence(projectIdentifier, projectSequence, principal.getName());
 		
 		return new ResponseEntity<ProjectTask>(projectTask, HttpStatus.OK);
 		

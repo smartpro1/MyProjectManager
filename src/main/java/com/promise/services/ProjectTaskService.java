@@ -6,11 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.promise.exceptions.ProjectIdException;
 import com.promise.exceptions.ProjectNotFoundException;
 import com.promise.models.Backlog;
+import com.promise.models.Project;
 import com.promise.models.ProjectTask;
+import com.promise.models.User;
 import com.promise.repositories.BacklogRepository;
+import com.promise.repositories.ProjectRepository;
 import com.promise.repositories.ProjectTaskRepository;
+import com.promise.repositories.UserRepository;
 
 @Service
 public class ProjectTaskService {
@@ -20,11 +25,26 @@ public class ProjectTaskService {
 	@Autowired
 	private ProjectTaskRepository projectTaskRepo;
 	
-	public ProjectTask createProjectTask(String projectIdentifier, ProjectTask projectTask) {
+	@Autowired 
+	private UserRepository userRepo;
+	
+	@Autowired
+	private ProjectRepository projectRepo;
+	
+	public ProjectTask createProjectTask(String projectIdentifier, ProjectTask projectTask, String username) {
 		Backlog backlog = backlogRepo.findByProjectIdentifier(projectIdentifier);
+		Project project =  getProjectByProjectIdentifier(projectIdentifier);
+		User user = getUserByUsername(username);
+		
 		if(backlog == null) {
 			throw new ProjectNotFoundException("The projectIdentifier supplied '" + projectIdentifier + "' is invalid.");
 		}
+		
+		
+		if(!user.getUsername().equals(project.getProjectLeader())) {
+			throw new ProjectIdException("invalid user or project id");
+		}
+		
 		Integer backlogSequence = backlog.getProjectSequence();
 		backlogSequence += 1;
 		backlog.setProjectSequence(backlogSequence);
@@ -48,17 +68,26 @@ public class ProjectTaskService {
 			
 	}
 	
-	public List<ProjectTask> getProjectTasksByProjectIdentifier(String projectIdentifier){
+	public List<ProjectTask> getProjectTasksByProjectIdentifier(String projectIdentifier, String username){
+		Project project =  getProjectByProjectIdentifier(projectIdentifier);
+		User user = getUserByUsername(username);
 		
 		if(!isBacklog(projectIdentifier)) {
 			throw new ProjectNotFoundException("The projectIdentifier supplied '" + projectIdentifier + "' is invalid.");
 		}
+		
+		if(!user.getUsername().equals(project.getProjectLeader())) {
+			throw new ProjectIdException("invalid user or project id");
+		}
+		
 		return projectTaskRepo.findByProjectIdentifierOrderByPriority(projectIdentifier);	
 	}
 	
-	public ProjectTask findProjectByProjectSequence(String projectIdentifier, String projectSequence) {
-		
+	public ProjectTask findProjectByProjectSequence(String projectIdentifier, String projectSequence, String username) {
+		Project project =  getProjectByProjectIdentifier(projectIdentifier);
+		User user = getUserByUsername(username);
 		ProjectTask projectTask = projectTaskRepo.findByProjectSequence(projectSequence);
+		
 		if(!isBacklog(projectIdentifier) || projectTask == null) {
 			throw new ProjectNotFoundException("Invalid project Identifier or projectSequence");
 		}
@@ -66,6 +95,11 @@ public class ProjectTaskService {
 		if(!projectTask.getProjectIdentifier().equals(projectIdentifier)) {
 			throw new ProjectNotFoundException("The projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
 		}
+		
+		if(!user.getUsername().equals(project.getProjectLeader())) {
+			throw new ProjectIdException("invalid user or project id");
+		}
+		
 		return projectTask;
 	}
 	
@@ -101,12 +135,18 @@ public class ProjectTaskService {
 		                
 	}
 	
-	public Boolean isBacklog(String projectIdentifier) {
+	private Boolean isBacklog(String projectIdentifier) {
 		Backlog backlog = backlogRepo.findByProjectIdentifier(projectIdentifier);
 		if(backlog == null) return false;
 		return true;
 	}
 	
+	public Project getProjectByProjectIdentifier(String projectIdentifier) {
+		return projectRepo.findByProjectIdentifier(projectIdentifier);
+	}
 	
+	private User getUserByUsername(String username) {
+		return userRepo.findByUsername(username);
+	}
 
 }

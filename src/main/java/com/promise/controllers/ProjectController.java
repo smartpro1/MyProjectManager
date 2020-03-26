@@ -60,8 +60,6 @@ public class ProjectController {
 			                               BindingResult result, Principal principal) {
 		if(result.hasErrors()) return projectService.validateError(result);
 
-		
-
 		Project updateProject = projectService.updateProject(projectIdentifier, project, principal.getName());
 
 		return new ResponseEntity<Project>(updateProject, HttpStatus.OK);
