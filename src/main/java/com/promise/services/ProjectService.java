@@ -82,12 +82,18 @@ public class ProjectService {
 		return project;
 	}
 	
-	public Project updateProject(String projectIdentifier, Project project) {
+	public Project updateProject(String projectIdentifier, Project project, String username) {
 		Project project1 = projectRepo.findByProjectIdentifier(projectIdentifier.toLowerCase());
+		User user = userRepo.findByUsername(username);
+		
 		if(project1 == null) {
 			throw new ProjectIdException("projectIdentifier '" + projectIdentifier + "' does not exist so cannot be updated");
 		} else if(!project1.getProjectIdentifier().equalsIgnoreCase(project.getProjectIdentifier())) {
 			throw new ProjectIdException("Project Identifier cannot be changed so this project has not been updated");
+		}
+		
+		if(!project.getProjectLeader().equals(user.getUsername())) {
+			throw new ProjectIdException("update declined: this project does not exist in your account");
 		}
 		
 		project.setBacklog(project1.getBacklog());
@@ -95,11 +101,18 @@ public class ProjectService {
 		return projectRepo.save(project);
 	}
 	
-	public void deleteById(String projectIdentifier) {
+	public void deleteById(String projectIdentifier, String username) {
 		Project project = projectRepo.findByProjectIdentifier(projectIdentifier.toLowerCase());
+		User user = userRepo.findByUsername(username);
+		
 		if(project == null) {
 			throw new ProjectIdException("projectIdentifier '" + projectIdentifier + "' does not exist so cannot be deleted");
 		}
+		
+		if(!project.getProjectLeader().equals(user.getUsername())) {
+			throw new ProjectIdException("delete action declined: this project does not exist in your account");
+		}
+		
 		projectRepo.deleteById(project.getId());
 	}
 	
