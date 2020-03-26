@@ -1,5 +1,6 @@
 package com.promise.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,22 +32,22 @@ public class ProjectController {
 	ProjectService projectService;
   
 	@PostMapping
-	public ResponseEntity<?> createProject(@Valid @RequestBody Project project, BindingResult result) {
+	public ResponseEntity<?> createProject(@Valid @RequestBody Project project, BindingResult result, Principal principal) {
 		if(result.hasErrors()) return projectService.validateError(result);
 		
-		Project newProject = projectService.createProject(project);
+		Project newProject = projectService.createProject(project, principal.getName());
 		return new ResponseEntity<Project>(newProject, HttpStatus.CREATED);
 	}
 	
 	@GetMapping()
-	public ResponseEntity<List<Project>> findAllProjects(){
-		List<Project> projects = projectService.findAllProjects();
+	public ResponseEntity<List<Project>> findAllProjects(Principal principal){
+		List<Project> projects = projectService.findAllProjects(principal.getName());
 		return new ResponseEntity<List<Project>>(projects, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{projectIdentifier}") 
-	public ResponseEntity<?> findProjectById(@PathVariable() String projectIdentifier) {
-		Project project = projectService.findProjectById(projectIdentifier);
+	public ResponseEntity<?> findProjectById(@PathVariable() String projectIdentifier, Principal principal) {
+		Project project = projectService.findProjectById(projectIdentifier, principal.getName());
 		return new ResponseEntity<Project>(project, HttpStatus.OK);
 	}
 	

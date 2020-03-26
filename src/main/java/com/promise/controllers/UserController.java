@@ -49,10 +49,11 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
+		if(result.hasErrors()) return projectService.validateError(result);
+		
 		// compare password
 		userValidator.validate(user, result);
 		
-		if(result.hasErrors()) return projectService.validateError(result);
 		User newUser = userService.registerUser(user);
 		return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
 		

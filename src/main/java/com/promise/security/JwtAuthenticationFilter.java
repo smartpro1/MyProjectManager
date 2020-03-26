@@ -12,15 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.promise.models.User;
 import com.promise.services.CustomUserDetailsService;
 import static com.promise.security.SecurityConstants.HEADER_STRING;
-import static com.promise.security.SecurityConstants.TOKEN_PREFIX;
-import static io.akeni.promise.ppmtool.security.SecurityConstants.HEADER_STRING;
-import static io.akeni.promise.ppmtool.security.SecurityConstants.TOKEN_PREFIX;;
+import static com.promise.security.SecurityConstants.TOKEN_PREFIX;;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
@@ -58,9 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	
 	private String getJwtFromRequest(HttpServletRequest request) {
 		String bearerToken = request.getHeader(HEADER_STRING);
-		if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX)) {
+		if(bearerToken.length()!=0 && bearerToken.startsWith(TOKEN_PREFIX)) {
 			return bearerToken.substring(7, bearerToken.length());
 		}
+		
 		return null;
 	}
 	
