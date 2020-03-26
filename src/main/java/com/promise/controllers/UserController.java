@@ -32,10 +32,12 @@ import static com.promise.security.SecurityConstants.TOKEN_PREFIX;
 public class UserController {
 	
 	@Autowired
-	UserService userService;
+	private UserService userService;
+	
 	
 	@Autowired
-	UserValidator userValidator;
+	private UserValidator userValidator;
+
 	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
@@ -44,14 +46,15 @@ public class UserController {
 	private AuthenticationManager authenticationManager;
 	
 	@Autowired 
-	ProjectService projectService;
+    private ProjectService projectService;
 	
-	@PostMapping("/registration")
+	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
+		if(result.hasErrors()) return projectService.validateError(result);
+		
 		// compare password
 		userValidator.validate(user, result);
 		
-		if(result.hasErrors()) return projectService.validateError(result);
 		User newUser = userService.registerUser(user);
 		return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
 		

@@ -1,7 +1,11 @@
 package com.promise.models;
 
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,8 +51,13 @@ public class User implements UserDetails{
 	private Date updated_At;
 	
 	// OneToMany with Project
-//	@OneToMany(cascade = CascadeType.REFRESH, mappedBy="user", orphanRemoval=true)
-//	private Project project;
+	@OneToMany(cascade = CascadeType.REFRESH, mappedBy="user", orphanRemoval=true)
+	private List<Project> projects = new ArrayList<>();
+	
+    public User() {
+		
+	}
+
 	
 	public Long getId() {
 		return id;
@@ -105,6 +114,16 @@ public class User implements UserDetails{
 	public void setUpdated_At(Date updated_At) {
 		this.updated_At = updated_At;
 	}
+	
+
+	public List<Project> getProjects() {
+		return projects;
+	}
+
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
+	}
+
 
 	@PrePersist
 	protected void onCreate() {

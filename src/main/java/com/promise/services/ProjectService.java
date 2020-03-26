@@ -16,7 +16,9 @@ import com.promise.exceptions.ProjectIdException;
 import com.promise.exceptions.ProjectNotFoundException;
 import com.promise.models.Backlog;
 import com.promise.models.Project;
+import com.promise.models.User;
 import com.promise.repositories.ProjectRepository;
+import com.promise.repositories.UserRepository;
 
 @Service
 public class ProjectService {
@@ -24,7 +26,15 @@ public class ProjectService {
 	@Autowired
 	ProjectRepository projectRepo;
 	
-	public Project createProject(Project project) {
+	@Autowired
+	UserRepository userRepo;
+	
+	public Project createProject(Project project, String username) {
+		User user = userRepo.findByUsername(username);
+		if(user == null) {
+			throw new ProjectNotFoundException("invalid user");
+		}
+		
 		String projIdentifier = project.getProjectIdentifier().toLowerCase();
 		Project newProject = projectRepo.findByProjectIdentifier(projIdentifier);
 		if(newProject != null) {
@@ -35,15 +45,18 @@ public class ProjectService {
 		project.setBacklog(backlog);
 	    backlog.setProject(project);
 		backlog.setProjectIdentifier(projIdentifier);
-	project.setProjectIdentifier(projIdentifier);
+	    project.setProjectIdentifier(projIdentifier);
+	    
+	    project.setUser(user);
+	    project.setProjectLeader(username);
 		
 		return projectRepo.save(project);
 	}
 	
-	public List<Project> findAllProjects() {
-		List<Project>projects = projectRepo.findAll();
+	public List<Project> findAllProjects(String username) {
+		List<Project>projects = projectRepo.findAllByProjectLeader(username);
 		if(projects.size() == 0) {
-			throw new ProjectNotFoundException("No projects found");
+			throw new ProjectNotFoundException("No project found");
 		}
 		return projects;
 	}
@@ -55,10 +68,15 @@ public class ProjectService {
 //		}
 //	}
 	
-	public Project findProjectById(String projectIdentifier) {
+	public Project findProjectById(String projectIdentifier, String username) {
 		Project project = projectRepo.findByProjectIdentifier(projectIdentifier.toLowerCase());
+		User user = userRepo.findByUsername(username);
 		if(project == null) {
 			throw new ProjectNotFoundException("projectIdentifier '" + projectIdentifier + "' cannot be found");
+		}
+		
+		if(!project.getProjectLeader().equals(user.getUsername())) {
+			throw new ProjectIdException("the project you are looking for does not exist in your account");
 		}
 		
 		return project;

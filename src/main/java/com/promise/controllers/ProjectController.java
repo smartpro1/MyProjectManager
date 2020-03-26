@@ -1,5 +1,6 @@
 package com.promise.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import com.promise.models.Project;
@@ -34,36 +35,26 @@ public class ProjectController {
 	ProjectService projectService;
   
 	@PostMapping
-	public ResponseEntity<?> createProject(@Valid @RequestBody Project project, BindingResult result) {
+	public ResponseEntity<?> createProject(@Valid @RequestBody Project project, BindingResult result, Principal principal) {
 		if(result.hasErrors()) return projectService.validateError(result);
 		
-		Project newProject = projectService.createProject(project);
+		Project newProject = projectService.createProject(project, principal.getName());
 		return new ResponseEntity<Project>(newProject, HttpStatus.CREATED);
 	}
 	
 	@GetMapping()
-	public ResponseEntity<List<Project>> findAllProjects(){
-		List<Project> projects = projectService.findAllProjects();
+	public ResponseEntity<List<Project>> findAllProjects(Principal principal){
+		List<Project> projects = projectService.findAllProjects(principal.getName());
 		return new ResponseEntity<List<Project>>(projects, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{projectIdentifier}") 
-	public ResponseEntity<?> findProjectById(@PathVariable() String projectIdentifier) {
-		Project project = projectService.findProjectById(projectIdentifier);
+	public ResponseEntity<?> findProjectById(@PathVariable() String projectIdentifier, Principal principal) {
+		Project project = projectService.findProjectById(projectIdentifier, principal.getName());
 		return new ResponseEntity<Project>(project, HttpStatus.OK);
 	}
 	
-//<<<<<<< HEAD
-//	@PutMapping(value="/{projectIdentifier}")
-//	//@RequestMapping(value = "/{projectIdentifier}", method = RequestMethod.PUT)
-//	public ResponseEntity<?> updateProject(@PathVariable("projectIdentifier") String projectIdentifier, @Valid @RequestBody Project project, BindingResult result) {
-//		System.out.println("got here 1");
-//		if(result.hasErrors()) {
-//			System.out.println("entered hasErrors");
-//			System.out.println(result);
-//			return projectService.validateError(result);
-//		}
-//		System.out.println("got here 2");
+
 	@PutMapping(value="/{projectIdentifier}", consumes="application/json")
 	public ResponseEntity<?> updateProject(@PathVariable() String projectIdentifier,@Valid @RequestBody Project project, BindingResult result) {
 		if(result.hasErrors()) return projectService.validateError(result);
