@@ -96,6 +96,10 @@ public class ProjectService {
 			throw new ProjectIdException("update declined: this project does not exist in your account");
 		}
 		
+		if(project1.getId() != project.getId()) {
+			throw new ProjectIdException("update declined: invalid id");
+		}
+		
 		project.setBacklog(project1.getBacklog());
 		
 		return projectRepo.save(project);

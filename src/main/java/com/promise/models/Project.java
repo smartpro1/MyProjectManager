@@ -55,6 +55,7 @@ public class Project {
 	@JsonIgnore
 	private User user;
 	
+	@Column(updatable=false)
 	private String projectLeader;
 	
 	@PrePersist
