@@ -56,18 +56,20 @@ public class ProjectController {
 	
 
 	@PutMapping(value="/{projectIdentifier}", consumes="application/json")
-	public ResponseEntity<?> updateProject(@PathVariable() String projectIdentifier,@Valid @RequestBody Project project, BindingResult result) {
+	public ResponseEntity<?> updateProject(@PathVariable() String projectIdentifier,@Valid @RequestBody Project project, 
+			                               BindingResult result, Principal principal) {
 		if(result.hasErrors()) return projectService.validateError(result);
 
 		
-		Project updateProject = projectService.updateProject(projectIdentifier, project);
-		System.out.println("passed updateProject");
+
+		Project updateProject = projectService.updateProject(projectIdentifier, project, principal.getName());
+
 		return new ResponseEntity<Project>(updateProject, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/{projectIdentifier}")
-	public ResponseEntity<?> deleteProjectById(@PathVariable() String projectIdentifier) {
-		 projectService.deleteById(projectIdentifier);;
+	public ResponseEntity<?> deleteProjectById(@PathVariable() String projectIdentifier,  Principal principal) {
+		 projectService.deleteById(projectIdentifier, principal.getName());;
 		return new ResponseEntity<String>("Project with id '" + projectIdentifier + "' deleted", HttpStatus.OK);
 	}
 }
