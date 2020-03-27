@@ -96,6 +96,8 @@ public class ProjectTaskService {
 			throw new ProjectNotFoundException("The projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
 		}
 		
+		
+		
 		if(!user.getUsername().equals(project.getProjectLeader())) {
 			throw new ProjectIdException("invalid user or project id");
 		}
@@ -103,8 +105,11 @@ public class ProjectTaskService {
 		return projectTask;
 	}
 	
-	public ProjectTask updateProjectTaskByProjectSequence(String projectIdentifier, String projectSequence, ProjectTask projectTask) {
+	public ProjectTask updateProjectTaskByProjectSequence(String projectIdentifier, String projectSequence, ProjectTask projectTask, String username) {
 		ProjectTask projectTask1 = projectTaskRepo.findByProjectSequence(projectSequence);
+		Project project =  getProjectByProjectIdentifier(projectIdentifier);
+		User user = getUserByUsername(username);
+		
 		if(!isBacklog(projectIdentifier) || projectTask1 == null) {
 			throw new ProjectNotFoundException("Invalid project Identifier or projectSequence");
 		}
@@ -117,18 +122,33 @@ public class ProjectTaskService {
 			throw new ProjectNotFoundException("update declined: projectIdentifier cannot be changed");
 		}
 		
+		if(!projectTask.getProjectSequence().equals(projectSequence)) {
+			throw new ProjectIdException("update declined: project sequence conflict");
+		}
+		
+		if(!user.getUsername().equals(project.getProjectLeader())) {
+			throw new ProjectIdException("invalid user or project id");
+		}
+		
 		return projectTaskRepo.save(projectTask);
 	}
 	
 	@Transactional
-	public void deleteProjectTaskByProjectSequence(String projectIdentifier, String projectSequence) {
+	public void deleteProjectTaskByProjectSequence(String projectIdentifier, String projectSequence, String username) {
+		Project project =  getProjectByProjectIdentifier(projectIdentifier);
+		User user = getUserByUsername(username);
 		ProjectTask projectTask1 = projectTaskRepo.findByProjectSequence(projectSequence);
+		
 		if(!isBacklog(projectIdentifier) || projectTask1 == null) {
 			throw new ProjectNotFoundException("Delete declined: invalid project Identifier or projectSequence");
 		}
 		
 		if(!projectTask1.getProjectIdentifier().equals(projectIdentifier)) {
 			throw new ProjectNotFoundException("Delete declined: the projectIdentifier '" + projectIdentifier +"' cannot be found in this project task");
+		}
+		
+		if(!user.getUsername().equals(project.getProjectLeader())) {
+			throw new ProjectIdException("invalid user or project id");
 		}
 		
 		projectTaskRepo.deleteByProjectSequence(projectSequence);

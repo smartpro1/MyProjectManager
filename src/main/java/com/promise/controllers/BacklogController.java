@@ -59,16 +59,18 @@ public class BacklogController {
 	
 	@PutMapping(value="/{projectIdentifier}/{projectSequence}", consumes="application/json")
 	public ResponseEntity<?> updateProject(@PathVariable String projectIdentifier, @PathVariable String projectSequence,
-			                               @Valid @RequestBody ProjectTask projectTask, BindingResult result) {
+			                               @Valid @RequestBody ProjectTask projectTask, BindingResult result, Principal principal) {
 		if(result.hasErrors()) return projectService.validateError(result);
 		
-		ProjectTask updateProjectByPTSequence = projectTaskService.updateProjectTaskByProjectSequence(projectIdentifier, projectSequence, projectTask);
+		ProjectTask updateProjectByPTSequence = projectTaskService.updateProjectTaskByProjectSequence(projectIdentifier, 
+				                                                  projectSequence, projectTask, principal.getName());
 		return new ResponseEntity<ProjectTask>(updateProjectByPTSequence, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/{projectIdentifier}/{projectSequence}")
-	public ResponseEntity<?> deleteProjectTaskByPTSequence(@PathVariable String projectIdentifier, @PathVariable String projectSequence) {
-	    projectTaskService.deleteProjectTaskByProjectSequence(projectIdentifier, projectSequence);
+	public ResponseEntity<?> deleteProjectTaskByPTSequence(@PathVariable String projectIdentifier, @PathVariable String projectSequence,
+			                                                Principal principal) {
+	    projectTaskService.deleteProjectTaskByProjectSequence(projectIdentifier, projectSequence, principal.getName());
 	    return new ResponseEntity<String>("ProjectTask with projectSequence '" + projectSequence +"' deleted", HttpStatus.OK);
 	}
 
