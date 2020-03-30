@@ -50,10 +50,9 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
-		if(result.hasErrors()) return projectService.validateError(result);
-		
 		// compare password
-		userValidator.validate(user, result);
+				userValidator.validate(user, result);
+		if(result.hasErrors()) return projectService.validateError(result);
 		
 		User newUser = userService.registerUser(user);
 		return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
@@ -62,6 +61,7 @@ public class UserController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result){
+		
 		if(result.hasErrors()) return projectService.validateError(result);
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
