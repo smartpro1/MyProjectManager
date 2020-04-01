@@ -1,11 +1,13 @@
 package com.promise.controllers;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.promise.models.User;
 import com.promise.payload.JWTLoginSuccessResponse;
 import com.promise.payload.LoginRequest;
+import com.promise.payload.PasswordResetRequest;
 import com.promise.security.JwtTokenProvider;
+import com.promise.services.EmailService;
 import com.promise.services.ProjectService;
 import com.promise.services.UserService;
 import com.promise.validator.UserValidator;
@@ -48,6 +52,9 @@ public class UserController {
 	@Autowired 
     private ProjectService projectService;
 	
+	@Autowired
+	private EmailService emailService;
+	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
 		// compare password
@@ -74,6 +81,27 @@ public class UserController {
 	}
 	
 	
-	
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest passwordResetRequest, BindingResult result, 
+			HttpServletRequest httpServletRequest){
+		if(result.hasErrors()) return projectService.validateError(result);
+		String userEmail = passwordResetRequest.getEmail();
+		User user = userService.checkUserByEmail(userEmail);
+		user.setResetToken(userService.generatePasswordResetToken());
+		userService.saveUser(user);
+		// something like this : https://mywebapp.com/reset?token=9e5bf4a8-66b8-433e-b91c-6382c1a25f00
+		String appUrl = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName();
+		
+		// Email message
+		SimpleMailMessage passwordResetEmail = new SimpleMailMessage();
+		passwordResetEmail.setFrom("smartpromise380@gmail.com");
+		passwordResetEmail.setTo(userEmail);
+		passwordResetEmail.setSubject("Password Reset Request");
+		passwordResetEmail.setText("To reset your password, click the link below:\n" + appUrl + "/reset?token=" +user.getResetToken());
+		emailService.sendEmail(passwordResetEmail);
+			
+		return new ResponseEntity<String>("reset password mail sent to " +userEmail, HttpStatus.OK);		
+		
+	}
 
 }

@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
@@ -53,6 +54,12 @@ public class User implements UserDetails{
 	// OneToMany with Project
 	@OneToMany(cascade = CascadeType.REFRESH, mappedBy="user", orphanRemoval=true)
 	private List<Project> projects = new ArrayList<>();
+	
+	// OneToOne with PasswordReset
+	//@OneToOne(cascade = CascadeType.ALL, mappedBy="user")
+	//private PasswordReset passwordReset;
+	
+	private String resetToken;
 	
     public User() {
 		
@@ -134,6 +141,18 @@ public class User implements UserDetails{
 	protected void onUpdate() {
 		this.updated_At = new Date();
 	}
+	
+	
+
+	public String getResetToken() {
+		return resetToken;
+	}
+
+
+	public void setResetToken(String resetToken) {
+		this.resetToken = resetToken;
+	}
+
 
 	/*
 	 * UserDetails interface methods
