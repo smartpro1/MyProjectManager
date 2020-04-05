@@ -10,5 +10,6 @@ import com.promise.models.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	User findByUsername(String username);
 	User getById(Long id);
+	User findByResetToken(String token);
 
 }

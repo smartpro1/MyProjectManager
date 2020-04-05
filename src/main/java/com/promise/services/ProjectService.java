@@ -121,7 +121,6 @@ public class ProjectService {
 	}
 	
 	public ResponseEntity<?> validateError(BindingResult result) {
-		    System.out.println("got into validate error");
 			Map<String, String> errorMap = new HashMap<>();
 			for (FieldError error: result.getFieldErrors()) {
 				errorMap.put(error.getField(), error.getDefaultMessage());

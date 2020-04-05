@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.promise.models.User;
+import com.promise.payload.ChangePasswordRequest;
 import com.promise.payload.JWTLoginSuccessResponse;
 import com.promise.payload.LoginRequest;
 import com.promise.payload.PasswordResetRequest;
@@ -27,6 +30,7 @@ import com.promise.security.JwtTokenProvider;
 import com.promise.services.EmailService;
 import com.promise.services.ProjectService;
 import com.promise.services.UserService;
+import com.promise.validator.ChangePasswordValidator;
 import com.promise.validator.UserValidator;
 import static com.promise.security.SecurityConstants.TOKEN_PREFIX;
 
@@ -41,7 +45,9 @@ public class UserController {
 	
 	@Autowired
 	private UserValidator userValidator;
-
+    
+	@Autowired
+	private ChangePasswordValidator changePasswordValidator;
 	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
@@ -81,11 +87,14 @@ public class UserController {
 	}
 	
 	
-	@PostMapping("/reset-password")
-	public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest passwordResetRequest, BindingResult result, 
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<?> forgotPassword(@Valid @RequestBody PasswordResetRequest passwordResetRequest, BindingResult result,  
 			HttpServletRequest httpServletRequest){
+		
 		if(result.hasErrors()) return projectService.validateError(result);
 		String userEmail = passwordResetRequest.getEmail();
+		System.out.println(userEmail);
 		User user = userService.checkUserByEmail(userEmail);
 		user.setResetToken(userService.generatePasswordResetToken());
 		userService.saveUser(user);
@@ -97,11 +106,21 @@ public class UserController {
 		passwordResetEmail.setFrom("smartpromise380@gmail.com");
 		passwordResetEmail.setTo(userEmail);
 		passwordResetEmail.setSubject("Password Reset Request");
-		passwordResetEmail.setText("To reset your password, click the link below:\n" + appUrl + "/reset?token=" +user.getResetToken());
+		passwordResetEmail.setText("To reset your password, click the link below:\n" + appUrl + ":3000/reset?token=" +user.getResetToken());
 		emailService.sendEmail(passwordResetEmail);
 			
 		return new ResponseEntity<String>("reset password mail sent to " +userEmail, HttpStatus.OK);		
 		
+	}
+	
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, BindingResult result){
+		// compare password
+		changePasswordValidator.validate(changePasswordRequest, result);
+        if(result.hasErrors()) return projectService.validateError(result);
+        userService.changePassword(changePasswordRequest.getPassword(), changePasswordRequest.getToken());
+        
+        return new ResponseEntity<String>("password reset successful", HttpStatus.OK);
 	}
 
 }

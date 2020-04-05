@@ -35,6 +35,16 @@ public class UserService {
 		 
 	}
 	
+	public void changePassword(String password, String token) {
+		User user = userRepo.findByResetToken(token);
+		if(user == null) {
+			throw new ProjectIdException("invalid token or user");
+		}
+		user.setPassword(bCryptPasswordEncoder.encode(password));
+		user.setResetToken(null);
+		saveUser(user);
+	}
+	
 	public void saveUser(User user) {
 		 userRepo.save(user);
 	}
