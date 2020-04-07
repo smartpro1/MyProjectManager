@@ -10,6 +10,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -56,10 +57,11 @@ public class User implements UserDetails{
 	private List<Project> projects = new ArrayList<>();
 	
 	// OneToOne with PasswordReset
-	//@OneToOne(cascade = CascadeType.ALL, mappedBy="user")
-	//private PasswordReset passwordReset;
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="user")
+	@JsonIgnore
+	private PasswordReset passwordReset;
 	
-	private String resetToken;
+	//private String resetToken;
 	
     public User() {
 		
@@ -142,15 +144,15 @@ public class User implements UserDetails{
 		this.updated_At = new Date();
 	}
 	
-	
 
-	public String getResetToken() {
-		return resetToken;
+
+	public PasswordReset getPasswordReset() {
+		return passwordReset;
 	}
 
 
-	public void setResetToken(String resetToken) {
-		this.resetToken = resetToken;
+	public void setPasswordReset(PasswordReset passwordReset) {
+		this.passwordReset = passwordReset;
 	}
 
 

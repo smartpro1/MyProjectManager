@@ -37,7 +37,7 @@ public class ChangePasswordRequest {
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
 	}
-	
+
 	
    
 }

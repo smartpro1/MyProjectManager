@@ -94,19 +94,18 @@ public class UserController {
 		
 		if(result.hasErrors()) return projectService.validateError(result);
 		String userEmail = passwordResetRequest.getEmail();
-		System.out.println(userEmail);
 		User user = userService.checkUserByEmail(userEmail);
-		user.setResetToken(userService.generatePasswordResetToken());
+		userService.generatePasswordResetToken(user);
 		userService.saveUser(user);
 		// something like this : https://mywebapp.com/reset?token=9e5bf4a8-66b8-433e-b91c-6382c1a25f00
 		String appUrl = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName();
-		
+		String resetToken = user.getPasswordReset().getResetToken();
 		// Email message
 		SimpleMailMessage passwordResetEmail = new SimpleMailMessage();
 		passwordResetEmail.setFrom("smartpromise380@gmail.com");
 		passwordResetEmail.setTo(userEmail);
 		passwordResetEmail.setSubject("Password Reset Request");
-		passwordResetEmail.setText("To reset your password, click the link below:\n" + appUrl + ":3000/reset?token=" +user.getResetToken());
+		passwordResetEmail.setText("To reset your password, click the link below:\n" + appUrl + ":3000/reset?token=" + resetToken);
 		emailService.sendEmail(passwordResetEmail);
 			
 		return new ResponseEntity<String>("reset password mail sent to " +userEmail, HttpStatus.OK);		
